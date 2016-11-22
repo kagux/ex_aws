@@ -19,19 +19,17 @@ defmodule ExAws.Route53 do
     request(:get, :list_hosted_zones, params: opts)
   end
 
+  @type create_hosted_zone_opts :: [
+    {:name, binary} |
+    {:comment, binary} |
+    {:private, boolean} |
+    {:vpc_is, binary} |
+    {:vpc_region, binary}
+  ]
+  @doc "Create hosted zone"
+  @spec create_hosted_zone(opts :: create_hosted_zone_opts) :: ExAws.Operation.RestQuery.t
   def create_hosted_zone(opts \\ []) do
-    payload = """
-      <?xml version="1.0" encoding="UTF-8"?>
-        <CreateHostedZoneRequest xmlns="https://route53.amazonaws.com/doc/2013-04-01/">
-           <CallerReference>tmp</CallerReference>
-           <Name>example.com</Name>
-        </CreateHostedZoneRequest>
-      """
-    payload =
-    {:CreateHostedZoneRequest, %{xmlns: "https://route53.amazonaws.com/doc/2013-04-01/"}, [
-      {:CallerReference, nil, "tmp"},
-      {:Name, nil, "example.com"},
-    ]} |> XmlBuilder.doc
+    payload = opts |> Map.new |> ExAws.Route53.Payload.CreateHostedZone.build
     request(:post, :create_hosted_zone, body: payload)
   end
 

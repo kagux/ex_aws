@@ -1,11 +1,11 @@
 if Code.ensure_loaded?(SweetXml) do
   defmodule ExAws.Route53.Parsers do
-    import SweetXml, only: [sigil_x: 2]
+    import SweetXml, only: [sigil_x: 2, transform_by: 2]
 
     def parse({:ok, %{body: xml}=resp}, :list_hosted_zones) do
       parsed_body = xml
       |> SweetXml.xpath(~x"//ListHostedZonesResponse",
-        is_truncated: ~x"./IsTruncated/text()"s,
+        is_truncated: ~x"./IsTruncated/text()"s |> transform_by(&(&1 == "true")),
         marker: ~x"./Marker/text()"s,
         max_items: ~x"./MaxItems/text()"i,
         next_marker: ~x"./NextMarker/text()"s,
@@ -18,7 +18,6 @@ if Code.ensure_loaded?(SweetXml) do
           comment:  ~x"./Config/Comment/text()"s
         ]
       )
-      |> (&Map.put(&1, :is_truncated, &1[:is_truncated] == "true")).()
 
       {:ok, Map.put(resp, :body, parsed_body)}
     end
