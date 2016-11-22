@@ -3,6 +3,7 @@ defmodule ExAws.Operation.RestQuery do
     http_method: nil,
     path: "/",
     params: %{},
+    body: "",
     service: nil,
     action: nil,
     parser: &ExAws.Utils.identity/2,

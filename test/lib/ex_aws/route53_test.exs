@@ -10,6 +10,7 @@ defmodule ExAws.Route53Test do
       action: :list_hosted_zones,
       http_method: :get,
       params: %{},
+      body: "",
       parser: &ExAws.Route53.Parsers.parse/2
     }
     assert expected == Route53.list_hosted_zones
@@ -21,37 +22,26 @@ defmodule ExAws.Route53Test do
   end
 
   test "create hosted zone" do
-    expected = %RestQuery{
+    expected_response = %{
       service: :route53,
       path: "/2013-04-01/hostedzone",
       action: :create_hosted_zone,
       http_method: :post,
-      params: %{}
+      params: %{},
+      parser: &ExAws.Route53.Parsers.parse/2
     }
 
-    response = Reoute53.create_hosted_zone(
-      name: "example.com",
+    response = Route53.create_hosted_zone name: "example.com"
+    assert %RestQuery{} = response
+    assert expected_response == Map.take(response, [:service, :path, :action, :http_method, :params, :parser])
 
-    )
-    assert expected == response = 
-
-      # body: """
-      # <?xml version="1.0" encoding="UTF-8"?>
-      #   <CreateHostedZoneRequest xmlns="https://route53.amazonaws.com/doc/2013-04-01/">
-      #      <CallerReference>string</CallerReference>
-      #      <DelegationSetId>string</DelegationSetId>
-      #      <HostedZoneConfig>
-      #         <Comment>string</Comment>
-      #         <PrivateZone>boolean</PrivateZone>
-      #      </HostedZoneConfig>
-      #      <Name>string</Name>
-      #      <VPC>
-      #         <VPCId>string</VPCId>
-      #         <VPCRegion>string</VPCRegion>
-      #      </VPC>
-      #   </CreateHostedZoneRequest>
-      # """
-
-
+    expected_body = ~r"""
+      <?xml version="1.0" encoding="UTF-8" \?>
+      <CreateHostedZoneRequest xmlns="https://route53.amazonaws.com/doc/2013-04-01/">
+      	<CallerReference>.*?</CallerReference>
+      	<Name>example.com</Name>
+      </CreateHostedZoneRequest>\
+      """
+    assert Regex.match?(expected_body, response.body)
   end
 end
