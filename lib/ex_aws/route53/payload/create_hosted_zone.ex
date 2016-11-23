@@ -49,5 +49,5 @@ defmodule ExAws.Route53.Payload.CreateHostedZone do
   end
   defp hosted_zone_config(_), do: []
 
-  defp uuid, do: DateTime.utc_now |> :erlang.phash2
+  def uuid, do: DateTime.utc_now |> :erlang.phash2
 end
