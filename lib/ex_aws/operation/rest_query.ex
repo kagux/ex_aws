@@ -14,10 +14,9 @@ end
 
 defimpl ExAws.Operation, for: ExAws.Operation.RestQuery do
   def perform(operation, config) do
-    data = ""
     headers = []
     url = ExAws.Request.Url.build(operation, config)
-    ExAws.Request.request(operation.http_method, url, data, headers, config, operation.service)
+    ExAws.Request.request(operation.http_method, url, operation.body, headers, config, operation.service)
     |> operation.parser.(operation.action)
   end
 

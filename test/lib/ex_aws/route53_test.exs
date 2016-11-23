@@ -46,13 +46,17 @@ defmodule ExAws.Route53Test do
   test "create hosted zone with comment" do
     response = Route53.create_hosted_zone name: "example.com", comment: "my blog"
     comment = response.body |> xpath(~x"//CreateHostedZoneRequest/HostedZoneConfig/Comment/text()"s)
+    is_private = response.body |> xpath(~x"//CreateHostedZoneRequest/HostedZoneConfig/PrivateZone"o)
     assert "my blog" == comment
+    refute is_private
   end
 
   test "create private hosted zone" do
     response = Route53.create_hosted_zone name: "example.com", private: true
+    comment = response.body |> xpath(~x"//CreateHostedZoneRequest/HostedZoneConfig/Comment"o)
     is_private = response.body |> xpath(~x"//CreateHostedZoneRequest/HostedZoneConfig/PrivateZone/text()"s)
     assert "true" == is_private
+    refute comment
   end
 
   test "create private hosted zone with a comment" do

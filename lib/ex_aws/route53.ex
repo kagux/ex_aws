@@ -33,20 +33,17 @@ defmodule ExAws.Route53 do
   def create_hosted_zone(opts \\ []) do
     payload = {
       :CreateHostedZoneRequest, %{xmlns: "https://route53.amazonaws.com/doc/2013-04-01/"}, [
-        {:CallerReference, nil, uuid},
-        {:Name, nil, opts[:name]}
-      ] |> ExAws.Xml.add_optional_node(
-          :HostedZoneConfig, nil, [
-            {:Comment, nil, opts[:comment]},
-            {:PrivateZone, nil, opts[:private]}
-          ]
-      ) |> ExAws.Xml.add_optional_node(
-        :VPC, nil, [
-          {:VPCId, nil, opts[:vpc_id]},
-          {:VPCRegion, nil, opts[:vpc_region]}
-        ]
-      )
-    } |> XmlBuilder.doc
+       {:CallerReference, nil, uuid},
+       {:Name, nil, opts[:name]}]
+    } |> ExAws.Xml.add_optional_node(
+          {:HostedZoneConfig, nil, nil}
+          |> ExAws.Xml.add_optional_node({:Comment, nil, opts[:comment]})
+          |> ExAws.Xml.add_optional_node({:PrivateZone, nil, opts[:private]})
+    ) |> ExAws.Xml.add_optional_node({
+         :VPC, nil, [
+           {:VPCId, nil, opts[:vpc_id]},
+           {:VPCRegion, nil, opts[:vpc_region]}]
+    }) |> XmlBuilder.doc
     request(:post, :create_hosted_zone, body: payload)
   end
 
